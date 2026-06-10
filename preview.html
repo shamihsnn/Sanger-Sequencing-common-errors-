@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Complete visual study guide for interpreting Sanger sequencing chromatograms. Learn to identify clean reads, heterozygous SNPs, dye blobs, mixed templates, indels, signal saturation, stutter peaks, and more with accurate schematic traces."/>
+  <title>Sanger Chromatogram — Complete Visual Study Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--panel:#ffffff;--ink:#0f172a;--muted:#475569;--line:#cbd5e1;
+  --shadow:0 8px 32px rgba(15,23,42,.08);--radius:20px;
+  --col-a:#16a34a;--col-c:#2563eb;--col-g:#1e293b;--col-t:#dc2626;
+  --accent:#6366f1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+.wrap{max-width:1320px;margin:0 auto;padding:20px}
+/* Hero */
+.hero{background:linear-gradient(135deg,#020617 0%,#0f172a 40%,#1e293b 100%);color:#fff;border-radius:28px;padding:36px 32px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.hero::before{content:'';position:absolute;top:-50%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,.12) 0%,transparent 70%);pointer-events:none}
+.eyebrow{display:inline-block;border:1px solid rgba(255,255,255,.15);background:rgba(99,102,241,.15);border-radius:999px;padding:6px 14px;font-size:11px;font-weight:800;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.85);backdrop-filter:blur(4px)}
+h1{font-size:clamp(1.8rem,4.5vw,3.2rem);font-weight:900;line-height:1.08;margin:16px 0 0;letter-spacing:-.02em}
+.sub{max-width:880px;margin-top:12px;color:#94a3b8;font-size:.98rem;line-height:1.75}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.pill{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);padding:7px 14px;border-radius:999px;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.75);transition:background .2s}
+.pill:hover{background:rgba(255,255,255,.14)}
+/* Layout */
+.section{margin-top:28px}
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:20px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+/* Panels & Cards */
+.panel{background:var(--panel);border:1px solid #e2e8f0;border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(15,23,42,.12)}
+.info{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.info h3,.card h3{font-size:.95rem;font-weight:800;margin-bottom:8px}
+.info p,.card p{color:#334155;font-size:.9rem;line-height:1.7}
+/* Color-coded cards */
+.good{background:#f0fdf4;border-color:#bbf7d0}.good h3{color:#15803d}
+.warn{background:#fffbeb;border-color:#fde68a}.warn h3{color:#a16207}
+.bad{background:#fef2f2;border-color:#fecaca}.bad h3{color:#b91c1c}
+.em{background:#eff6ff;border-color:#bfdbfe}.em h3{color:#1d4ed8}
+.purple{background:#f5f3ff;border-color:#ddd6fe}.purple h3{color:#6d28d9}
+/* Section headings */
+.sect-title{font-size:11px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:#6366f1}
+.sect-head{font-size:1.7rem;font-weight:900;margin:8px 0 0;letter-spacing:-.01em}
+.sect-sub{color:var(--muted);line-height:1.7;margin-top:8px;font-size:.93rem}
+/* Trace display */
+.tracebox{background:var(--panel);border:1px solid #e2e8f0;border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+.tracewrap{overflow:hidden;border:1px solid #e8ecf1;background:linear-gradient(180deg,#fafbfd,#f4f6f9);border-radius:14px;position:relative}
+.tracewrap svg{display:block;width:100%;height:auto}
+/* Legend */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;font-size:12px;font-weight:700;color:#475569}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* Tabs */
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.tab{border:none;border-radius:999px;padding:9px 16px;font-weight:700;font-size:.82rem;background:#e2e8f0;color:#334155;cursor:pointer;transition:all .2s;font-family:inherit}
+.tab:hover{background:#cbd5e1}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 4px 14px rgba(99,102,241,.3)}
+/* Table */
+.ref-table{width:100%;border-collapse:collapse;font-size:.88rem;margin-top:12px}
+.ref-table th{background:#f8fafc;border:1px solid #e2e8f0;padding:10px 12px;text-align:left;font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:#64748b}
+.ref-table td{border:1px solid #e2e8f0;padding:10px 12px;vertical-align:top}
+.ref-table tr:nth-child(even) td{background:#fafbfc}
+.ref-table tr:hover td{background:#f1f5f9}
+/* Metric cards */
+.metric{text-align:center;padding:18px 14px}
+.metric .val{font-size:1.8rem;font-weight:900;color:var(--accent)}
+.metric .lbl{font-size:.78rem;font-weight:700;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.1em}
+/* Bul list */
+.bul{padding-left:18px;color:#334155;line-height:1.8;font-size:.9rem}
+.bul li{margin:4px 0}
+/* Footer */
+.footer{margin-top:28px;background:linear-gradient(135deg,#020617,#0f172a);color:#e2e8f0;border-radius:24px;padding:20px 24px;box-shadow:var(--shadow)}
+.labels{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.label{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:5px 12px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.7)}
+/* Annotation tag */
+.anno-tag{display:inline-block;background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:2px 8px;font-size:.75rem;font-weight:700;color:#92400e;margin-top:8px}
+/* Responsive */
+@media(max-width:980px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+@media(max-width:600px){.wrap{padding:12px}.hero{padding:22px 18px;border-radius:20px}h1{font-size:1.5rem}.sect-head{font-size:1.3rem}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HERO ===== -->
+  <div class="hero">
+    <span class="eyebrow">Sanger Sequencing · Chromatogram Interpretation</span>
+    <h1>Read the Trace, Not the Fantasy.</h1>
+    <div class="sub">
+      A complete visual study guide to interpreting Sanger sequencing chromatograms. Each pattern below uses
+      accurate schematic traces showing how fluorescence peaks actually appear — one dominant color per base
+      position in a clean read, and distinct distortion signatures for each type of artifact. Learn to
+      distinguish real biological variants from technical noise.
+    </div>
+    <div class="pills">
+      <div class="pill">📊 12 Diagnostic Patterns</div>
+      <div class="pill">🔬 Compare Normal vs. Error</div>
+      <div class="pill">✂️ Trim Low-Quality Ends</div>
+      <div class="pill">🧬 Always Verify Bidirectionally</div>
+    </div>
+  </div>
+
+  <!-- ===== CLEAN READ ===== -->
+  <div class="grid2 section">
+    <div class="tracebox">
+      <div class="sect-title">Reference Standard</div>
+      <div class="sect-head" style="font-size:1.4rem">What a Clean Chromatogram Looks Like</div>
+      <div class="sect-sub">Each base position produces <strong>one dominant peak</strong> in its corresponding color channel. The other three channels remain near baseline. Peaks are sharp, evenly spaced, and uniformly tall.</div>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--col-a)"></i>A — Adenine</span>
+        <span><i class="dot" style="background:var(--col-c)"></i>C — Cytosine</span>
+        <span><i class="dot" style="background:var(--col-g)"></i>G — Guanine</span>
+        <span><i class="dot" style="background:var(--col-t)"></i>T — Thymine</span>
+      </div>
+      <div class="tracewrap" style="margin-top:10px">
+        <svg id="cleanSvg" viewBox="0 0 760 190"></svg>
+      </div>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start">
+      <div class="info em">
+        <h3>🔍 How to Inspect a Trace</h3>
+        <ul class="bul">
+          <li>Look for <strong>one sharp peak per position</strong> with a flat baseline between peaks.</li>
+          <li>The <strong>middle of the read</strong> (bases ~50–600) is the most reliable region.</li>
+          <li>The first 20–40 bases are often noisy due to unincorporated primers.</li>
+          <li>Signal quality drops toward the end as reagents are depleted.</li>
+          <li>Always compare <strong>forward and reverse reads</strong> before calling a variant.</li>
+        </ul>
+      </div>
+      <div class="info warn">
+        <h3>⚠️ Reading Rule</h3>
+        <p>If the trace is mixed <strong>from the very beginning</strong>, suspect contamination or multiple templates. If it becomes mixed <strong>only after a specific position</strong>, suspect a heterozygous indel or secondary priming site.</p>
+      </div>
+      <div class="info good">
+        <h3>✅ Quality Indicators</h3>
+        <p>Clean traces have a <strong>Phred quality score ≥ Q20</strong> (99% accuracy) across the usable region. Signal-to-noise ratio should be <strong>100–750</strong>. Peak heights should be relatively uniform without abrupt changes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PATTERN GALLERY ===== -->
+  <div class="panel section">
+    <div class="sect-title">Visual Pattern Library</div>
+    <div class="sect-head">Common Chromatogram Patterns</div>
+    <div class="sect-sub">Select a pattern to see its schematic trace, visual features, likely cause, and recommended action. Each trace is drawn to show how that specific artifact actually looks compared to a clean read.</div>
+    <div class="tabs" id="tabs"></div>
+    <div id="viewer"></div>
+  </div>
+
+  <!-- ===== COMPARISON CARDS ===== -->
+  <div class="grid3 section">
+    <div class="info good">
+      <h3>Heterozygous SNP vs. Mixed Template</h3>
+      <p><strong>Het SNP:</strong> Double peak at <em>one specific position</em>; rest of trace is clean. Peak ratio is ~1:1, consistent in both forward and reverse reads.</p>
+      <p style="margin-top:8px"><strong>Mixed template:</strong> Double peaks <em>throughout the entire read</em>. Peak ratios vary, and the pattern often differs between forward and reverse reads.</p>
+    </div>
+    <div class="info warn">
+      <h3>Homozygous Variant vs. Clean Wild-Type</h3>
+      <p>A homozygous variant looks <strong>identical to a clean read</strong> by visual inspection alone — single sharp peaks with no overlap. The only clue is a <strong>mismatch when aligned to the reference sequence</strong>. This is why reference comparison is mandatory.</p>
+    </div>
+    <div class="info bad">
+      <h3>Indel vs. Contamination</h3>
+      <p><strong>Indel:</strong> Clean start, then a <strong>sudden permanent phase shift</strong> at the indel site. Everything downstream shows overlapping double peaks.</p>
+      <p style="margin-top:8px"><strong>Contamination:</strong> The mess starts <strong>from the very beginning</strong> of the trace, not at a specific transition point.</p>
+    </div>
+  </div>
+
+  <!-- ===== QUALITY METRICS ===== -->
+  <div class="panel section">
+    <div class="sect-title">Quality Metrics</div>
+    <div class="sect-head">Phred Quality Scores &amp; What They Mean</div>
+    <div class="sect-sub">Phred scores quantify base-call confidence: Q = −10 × log₁₀(P), where P is the error probability.</div>
+    <div class="grid4" style="margin-top:14px">
+      <div class="card metric"><div class="val">Q10</div><div class="lbl">90% Accuracy</div><p style="font-size:.78rem;margin-top:6px">1 in 10 error. Unreliable — trim or discard these bases.</p></div>
+      <div class="card metric"><div class="val">Q20</div><div class="lbl">99% Accuracy</div><p style="font-size:.78rem;margin-top:6px">1 in 100 error. Minimum acceptable quality for most applications.</p></div>
+      <div class="card metric"><div class="val">Q30</div><div class="lbl">99.9% Accuracy</div><p style="font-size:.78rem;margin-top:6px">1 in 1,000 error. High-quality; benchmark for sequencing standards.</p></div>
+      <div class="card metric"><div class="val">Q40</div><div class="lbl">99.99% Accuracy</div><p style="font-size:.78rem;margin-top:6px">1 in 10,000 error. Excellent — rarely achieved at read ends.</p></div>
+    </div>
+  </div>
+
+  <!-- ===== QUICK REFERENCE TABLE ===== -->
+  <div class="panel section">
+    <div class="sect-title">Quick Reference</div>
+    <div class="sect-head">All Patterns at a Glance</div>
+    <div style="overflow-x:auto;margin-top:14px">
+      <table class="ref-table">
+        <thead><tr>
+          <th>Pattern</th><th>Key Visual Feature</th><th>Most Likely Cause</th><th>Recommended Action</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><strong>Clean Read</strong></td><td>Single sharp peak per position, flat baseline</td><td>Good template, good reaction</td><td>Use the middle region for analysis</td></tr>
+          <tr><td><strong>Heterozygous SNP</strong></td><td>Double peak at one position only</td><td>Two alleles at a single locus</td><td>Confirm with reverse read + reference alignment</td></tr>
+          <tr><td><strong>Homozygous Variant</strong></td><td>Looks clean — detected only by reference mismatch</td><td>Both alleles carry the same variant</td><td>Align to reference; verify bidirectionally</td></tr>
+          <tr><td><strong>Dye Blob</strong></td><td>Large irregular mass, often near bases 70–190</td><td>Unincorporated dye terminators / poor cleanup</td><td>Repeat post-sequencing purification</td></tr>
+          <tr><td><strong>Mixed Template</strong></td><td>Double peaks throughout the entire read</td><td>Contamination or multiple templates</td><td>Re-purify; re-clone from a single colony</td></tr>
+          <tr><td><strong>Indel (Het)</strong></td><td>Clean → sudden permanent phase shift</td><td>Heterozygous insertion or deletion</td><td>Use TIDE/ICE tools; compare both directions</td></tr>
+          <tr><td><strong>Low Signal</strong></td><td>Very weak peaks, high baseline noise</td><td>Insufficient template or poor amplification</td><td>Increase template; check DNA purity (A260/A280)</td></tr>
+          <tr><td><strong>End Drop-off</strong></td><td>Peaks fade toward the read end</td><td>Normal reagent depletion</td><td>Trim the low-quality tail before interpretation</td></tr>
+          <tr><td><strong>Broad Peaks</strong></td><td>Wide, overlapping, poorly resolved peaks</td><td>Contaminants (salts, ethanol, EDTA)</td><td>Re-purify template; use water/Tris elution</td></tr>
+          <tr><td><strong>Signal Saturation</strong></td><td>Flat-topped peaks with pull-up artifacts</td><td>Excess template overloading the detector</td><td>Dilute template and re-run</td></tr>
+          <tr><td><strong>Stutter Peaks</strong></td><td>Small echo peaks around homopolymer runs</td><td>Polymerase slippage on repeat sequences</td><td>Use specialized polymerases or clone to separate</td></tr>
+          <tr><td><strong>Secondary Structure</strong></td><td>Abrupt signal loss mid-read</td><td>Hairpin/stem-loop stalling the polymerase</td><td>Add DMSO; try alternative primer or direction</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== BEST PRACTICES ===== -->
+  <div class="panel section">
+    <div class="sect-title">Best Practices</div>
+    <div class="sect-head" style="font-size:1.4rem">Template Preparation &amp; Primer Design</div>
+    <div class="grid3" style="margin-top:14px">
+      <div class="card">
+        <h3>🧪 Template Quality</h3>
+        <ul class="bul">
+          <li><strong>Plasmid DNA:</strong> 150–300 ng per reaction</li>
+          <li><strong>PCR products:</strong> 10–40 ng per reaction</li>
+          <li><strong>A260/A280:</strong> 1.8–2.0 (protein-free)</li>
+          <li><strong>A260/A230:</strong> ≥ 2.0 (salt/organic-free)</li>
+          <li>Use fluorometric quantification (Qubit) over NanoDrop for accuracy</li>
+          <li>Avoid EDTA, excess salts, and residual ethanol</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🎯 Primer Design</h3>
+        <ul class="bul">
+          <li>Length: 18–24 nucleotides</li>
+          <li>GC content: 40–60%</li>
+          <li>Melting temperature (Tₘ): 50–65 °C</li>
+          <li>Prime ≥ 100 bp away from the region of interest</li>
+          <li>Avoid secondary structure, primer dimers, and homopolymeric runs</li>
+          <li>One primer per reaction — do not mix forward and reverse</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>✅ Validation Checklist</h3>
+        <ul class="bul">
+          <li>Always sequence <strong>bidirectionally</strong> (forward + reverse)</li>
+          <li>Align to a <strong>reference sequence</strong></li>
+          <li>Trim bases with <strong>Q &lt; 20</strong></li>
+          <li>Inspect <strong>raw .ab1 files</strong> in a trace viewer (e.g., SnapGene, Sequence Scanner)</li>
+          <li>Check that PCR yields a <strong>single clean band</strong> on gel</li>
+          <li>For critical variants, <strong>repeat the sequencing</strong> from fresh template</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRACTICAL CAUTIONS ===== -->
+  <div class="panel section">
+    <div class="sect-title">Practical Cautions</div>
+    <div class="sect-head" style="font-size:1.4rem">What Not to Over-Claim</div>
+    <div class="grid3" style="margin-top:14px">
+      <div class="card bad">
+        <h3>🚫 Do Not Trust the Tail</h3>
+        <p>End-of-read quality decline is expected. Base calls from the far end (typically past base ~700) are less reliable. Always trim before interpreting.</p>
+      </div>
+      <div class="card warn">
+        <h3>🚫 Do Not Rely on One Direction</h3>
+        <p>A single forward trace can mislead about homozygous changes, dye artifacts, and local noise. The reverse read is essential for confirmation.</p>
+      </div>
+      <div class="card bad">
+        <h3>🚫 Do Not Confuse Saturation with Biology</h3>
+        <p>Overloaded signal creates <strong>spectral pull-up</strong> — ghost peaks in other channels that mimic heterozygosity. Dilute and re-run before calling a variant.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <div class="footer">
+    <div style="font-size:1rem;font-weight:900">Sources &amp; References</div>
+    <div style="margin-top:8px;color:#94a3b8;font-size:.88rem;line-height:1.7">
+      This guide synthesizes information from established Sanger sequencing troubleshooting references.
+      All traces are educational schematics — not copied vendor images. Always consult your sequencing
+      facility's specific protocols for instrument-specific guidance.
+    </div>
+    <div class="labels">
+      <span class="label">MGH DNA Core Troubleshooting Guide</span>
+      <span class="label">Thermo Fisher Scientific</span>
+      <span class="label">Addgene Sequence Analysis Tips</span>
+      <span class="label">Harvard Biopolymers Facility</span>
+      <span class="label">University of North Texas</span>
+      <span class="label">GENEWIZ / Azenta Life Sciences</span>
+      <span class="label">University of Missouri DNA Core</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   SANGER CHROMATOGRAM TRACE GENERATION ENGINE
+   ================================================================ */
+const W=760,BL=160,TOP=18,RES=300;
+const COLS=['#16a34a','#2563eb','#1e293b','#dc2626'];
+const BNAMES=['A','C','G','T'];
+const BMAP={A:0,C:1,G:2,T:3};
+
+// Gaussian function
+function G(x,c,s){return Math.exp(-.5*((x-c)/s)**2)}
+
+// Deterministic pseudo-noise
+function pn(x,ch){return Math.sin(x*.73+ch*47)*Math.cos(x*1.3+ch*23)*.5+Math.sin(x*1.7+ch*11)*.3+Math.cos(x*2.1+ch*67)*.2}
+
+// Base positions for N bases in 760px width
+function basePos(n){
+  const margin=50,space=(W-2*margin)/(n-1);
+  return Array.from({length:n},(_,i)=>Math.round(margin+i*space));
+}
+
+// Convert sequence string to channel peak arrays
+function seqPeaks(seq,opts={}){
+  const pos=basePos(seq.length);
+  const chs=[[],[],[],[]];
+  for(let i=0;i<seq.length;i++){
+    const b=seq[i];
+    if(b==='N')continue;
+    const ch=BMAP[b];
+    if(ch===undefined)continue;
+    const h=opts.heights?opts.heights[i]:(0.88+0.12*Math.sin(i*2.1+0.7));
+    chs[ch].push({x:pos[i],h,s:opts.sigma||20});
+  }
+  return chs;
+}
+
+// Generate SVG paths from channel peak arrays
+function makePaths(chs,opts={}){
+  const noiseAmp=opts.noise||0;
+  const fade=opts.fade||null;
+  const clip=opts.clip||null;
+  const svg=[];
+  for(let ch=0;ch<4;ch++){
+    const peaks=chs[ch]||[];
+    const pts=[];
+    for(let i=0;i<=RES;i++){
+      const x=(i/RES)*W;
+      let v=0;
+      for(const p of peaks){
+        v+=(p.h||1)*G(x,p.x,p.s||20);
+      }
+      if(noiseAmp>0) v+=noiseAmp*pn(x,ch);
+      if(fade){
+        if(x>fade.s){
+          const f=Math.min(1,(x-fade.s)/(fade.e-fade.s));
+          v*=Math.max(0.03,1-f*fade.amt);
+        }
+      }
+      v=Math.max(0,Math.min(1.2,v));
+      if(clip&&v>clip) v=clip+(v-clip)*0.04;
+      const y=BL-v*(BL-TOP);
+      pts.push(`${i?'L':'M'}${x.toFixed(1)},${y.toFixed(1)}`);
+    }
+    svg.push(`<path d="${pts.join(' ')}" fill="none" stroke="${COLS[ch]}" stroke-width="2" stroke-linecap="round"/>`);
+  }
+  return svg.join('\n');
+}
+
+// Generate base labels above peaks
+function makeLabels(seq,opts={}){
+  const pos=basePos(seq.length);
+  let labels='';
+  for(let i=0;i<seq.length;i++){
+    const b=seq[i];
+    if(b==='N')continue;
+    const ch=BMAP[b];
+    if(ch===undefined)continue;
+    const col=COLS[ch];
+    labels+=`<text x="${pos[i]}" y="12" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="${col}">${b}</text>\n`;
+  }
+  return labels;
+}
+
+// Grid background lines
+function makeGrid(seq){
+  const pos=basePos(seq.length);
+  let g='<g opacity=".2">';
+  for(const x of pos){
+    g+=`<line x1="${x}" y1="16" x2="${x}" y2="${BL}" stroke="#cbd5e1" stroke-dasharray="3 3"/>`;
+  }
+  g+='</g>';
+  g+=`<line x1="16" y1="${BL}" x2="${W-16}" y2="${BL}" stroke="#94a3b8" stroke-width=".8"/>`;
+  g+=`<line x1="16" y1="16" x2="16" y2="${BL}" stroke="#94a3b8" stroke-width=".8"/>`;
+  return g;
+}
+
+// Full SVG content
+function fullSVG(seq,chs,opts={}){
+  let svg=makeGrid(seq);
+  svg+=makePaths(chs,opts);
+  if(opts.showLabels!==false) svg+=makeLabels(seq,opts);
+  if(opts.annotations) svg+=opts.annotations;
+  return svg;
+}
+
+/* ================================================================
+   PATTERN DEFINITIONS — scientifically accurate
+   ================================================================ */
+const CLEAN_SEQ='ATGCACGTAG';
+
+const PATTERNS={
+  clean:{
+    title:'Clean Read',
+    icon:'✅',
+    note:'The gold standard. One sharp peak per base position, flat baseline, uniform peak heights.',
+    howItLooks:'Each position shows exactly one dominant peak in the corresponding color channel (A=green, C=blue, G=black, T=red). The three non-dominant channels remain at or near the baseline. Peaks are gaussian-shaped, evenly spaced, and roughly the same height. The baseline between peaks returns close to zero.',
+    cause:'Properly purified, single-species DNA template at the correct concentration (150–300 ng for plasmid, 10–40 ng for PCR products), combined with a well-designed primer binding to a unique site.',
+    action:'This is what you want. Focus interpretation on the middle region of the read (bases ~50–600). The first 20–40 bases and the far end are less reliable and should be trimmed.',
+    keyFeature:'One peak per position — no overlap between channels.',
+    build:function(){
+      const seq=CLEAN_SEQ;
+      const chs=seqPeaks(seq);
+      return{seq,svg:fullSVG(seq,chs)};
+    }
+  },
+
+  hetero:{
+    title:'Heterozygous SNP',
+    icon:'🧬',
+    note:'A double peak at one specific position, with the rest of the trace remaining clean.',
+    howItLooks:'The trace is clean throughout, except at one position where two peaks of different colors overlap at roughly equal height (~50% each of normal). This double peak represents two alleles. The peak ratio should be approximately 1:1 (40–60%). Before and after the SNP site, the trace returns to normal single peaks.',
+    cause:'The sample contains two alleles at a single locus — one from each chromosome in a diploid organism. This is a real biological variant.',
+    action:'Confirm the double peak appears at the same position in both forward and reverse reads. Verify it matches a known SNP in the reference database. If the peak ratio is very unequal (e.g., 80:20), consider the possibility of mosaicism or subclonal variation.',
+    keyFeature:'Double peak at exactly ONE position — rest of trace is clean.',
+    build:function(){
+      const seq='ATGCAAGT AG';// display seq
+      const realSeq='ATGCACGTAG';
+      const chs=seqPeaks(realSeq);
+      const pos=basePos(realSeq.length);
+      // At position 5 (G), add an A peak at half height, reduce G to half
+      const snpPos=pos[5];
+      // Modify G channel: reduce height at position 5
+      for(const p of chs[2]){if(Math.abs(p.x-snpPos)<5)p.h=0.48;}
+      // Add A channel peak at position 5
+      chs[0].push({x:snpPos,h:0.48,s:20});
+      // Annotation arrow
+      const anno=`<line x1="${snpPos}" y1="25" x2="${snpPos}" y2="${BL-5}" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 3" opacity=".7"/>
+        <text x="${snpPos}" y="${BL+14}" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#d97706">SNP</text>`;
+      // Fix labels for the SNP position
+      let labels='';
+      for(let i=0;i<realSeq.length;i++){
+        const b=realSeq[i];
+        const ch=BMAP[b];
+        const col=COLS[ch];
+        if(i===5){
+          labels+=`<text x="${pos[i]-8}" y="12" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="800" fill="${COLS[0]}">A</text>`;
+          labels+=`<text x="${pos[i]+8}" y="12" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="800" fill="${COLS[2]}">G</text>`;
+        }else{
+          labels+=`<text x="${pos[i]}" y="12" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="${col}">${b}</text>`;
+        }
+      }
+      return{seq:realSeq,svg:makeGrid(realSeq)+makePaths(chs)+labels+anno};
+    }
+  },
+
+  homo:{
+    title:'Homozygous Variant',
+    icon:'🔍',
+    note:'Looks identical to a clean read. Detected only by aligning to the reference sequence.',
+    howItLooks:'The trace appears perfectly clean — single sharp peaks, flat baseline, no double peaks anywhere. The variant base produces a normal-looking peak in a single color, but that color differs from what the reference sequence predicts at that position. Without reference comparison, this variant is invisible.',
+    cause:'Both alleles carry the same mutation. Since both chromosomes produce the same base, there is no mixed signal — the chromatogram looks normal.',
+    action:'This is why you must always align to a reference sequence. Visual inspection alone cannot detect homozygous variants. Confirm bidirectionally and check if the variant is in a coding region, splice site, or other functionally important area.',
+    keyFeature:'Invisible without reference alignment — the trace looks clean.',
+    build:function(){
+      // Same as clean but position 5 is T instead of G (reference says G)
+      const seq='ATGCATGTAG';// T at pos 5 instead of C
+      const chs=seqPeaks(seq);
+      const pos=basePos(seq.length);
+      // Annotation
+      const vpos=pos[5];
+      const anno=`<rect x="${vpos-18}" y="16" width="36" height="${BL-20}" rx="4" fill="#fef3c7" opacity=".3" stroke="#f59e0b" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="${vpos}" y="${BL+14}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#d97706">REF: C → T</text>`;
+      return{seq,svg:fullSVG(seq,chs,{annotations:anno})};
+    }
+  },
+
+  dye:{
+    title:'Dye Blob',
+    icon:'💧',
+    note:'A large, broad, multi-colored mass — usually near bases 70–190 — from unincorporated dye terminators.',
+    howItLooks:'One or more very wide, tall, often overlapping peaks appear early in the trace (typically between bases 70 and 190). All four color channels may peak together in this region, creating a multicolored "blob" that obscures the real sequence. After the blob, the trace may return to normal quality.',
+    cause:'Unincorporated fluorescent dye terminators that were not removed during the post-sequencing cleanup step. Common causes include incorrect ethanol concentrations during purification, skipped cleanup steps, or failed sequencing reactions (excess dye with no product).',
+    action:'Repeat the post-sequencing purification. Ensure correct ethanol/salt concentrations in the cleanup protocol. If using enzymatic cleanup (e.g., ExoSAP-IT), verify that the enzyme is active. Check that template quality and concentration are sufficient for the reaction to complete.',
+    keyFeature:'Broad multi-colored mass early in the read, obscuring real peaks.',
+    build:function(){
+      const seq='ATGCACGTAG';
+      const chs=seqPeaks(seq);
+      const pos=basePos(seq.length);
+      // Add dye blob: large wide peaks in ALL channels near the beginning
+      const blobCenter=pos[1];// around position 1-2
+      chs[0].push({x:blobCenter,h:0.85,s:55});
+      chs[1].push({x:blobCenter+15,h:0.95,s:50});
+      chs[2].push({x:blobCenter-10,h:0.75,s:52});
+      chs[3].push({x:blobCenter+5,h:0.9,s:48});
+      // Reduce normal peak heights in blob region
+      for(let ch=0;ch<4;ch++){
+        for(const p of chs[ch]){
+          if(p.s<=25 && Math.abs(p.x-blobCenter)<80) p.h*=0.3;
+        }
+      }
+      const anno=`<text x="${blobCenter}" y="${BL+14}" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#dc2626">DYE BLOB</text>`;
+      return{seq,svg:fullSVG(seq,chs,{annotations:anno})};
+    }
+  },
+
+  mixed:{
+    title:'Mixed Template',
+    icon:'🔀',
+    note:'Overlapping double peaks throughout the entire read — from contamination or multiple templates.',
+    howItLooks:'Nearly every position shows two or more overlapping peaks of different colors. The peak ratios may vary from position to position (unlike a het SNP where the ratio is consistent). The baseline is elevated, and it is impossible to make a single clean base call at most positions. The pattern persists in both directions but often looks different between forward and reverse.',
+    cause:'The sequencing reaction is processing more than one DNA template simultaneously. Common sources include contamination of the template stock, picking multiple colonies, non-specific primer binding to the host genome, or residual genomic DNA in plasmid preps.',
+    action:'Restart from scratch: re-streak the plate, pick a single well-isolated colony, re-grow, and re-purify. If using PCR products, verify a single clean band on gel. Check primer specificity with BLAST. Consider using a different primer.',
+    keyFeature:'Double peaks EVERYWHERE — not just at one position.',
+    build:function(){
+      const seq1='ATGCACGTAG';
+      const seq2='CGATGACTCG';// second "contaminating" sequence
+      const pos=basePos(seq1.length);
+      const chs=seqPeaks(seq1);
+      // Add secondary peaks from seq2 at ~40% height
+      for(let i=0;i<seq2.length;i++){
+        const b=seq2[i];
+        const ch=BMAP[b];
+        if(ch===undefined)continue;
+        chs[ch].push({x:pos[i],h:0.38+0.08*Math.sin(i*1.3),s:20});
+      }
+      return{seq:seq1,svg:fullSVG(seq1,chs,{noise:0.015})};
+    }
+  },
+
+  indel:{
+    title:'Indel (Het)',
+    icon:'✂️',
+    note:'Clean start, then a sudden permanent phase shift — the hallmark of a heterozygous insertion or deletion.',
+    howItLooks:'The first portion of the trace looks clean with single sharp peaks. At a specific position (the indel site), the trace suddenly becomes messy with persistent double peaks for the remainder of the read. This happens because the two alleles (one with the indel, one without) are now out of phase — every downstream base is offset by the length of the insertion or deletion.',
+    cause:'One allele contains an insertion or deletion while the other does not. After the indel site, the sequencer reads two offset sequences simultaneously, creating a permanent overlap that cannot be resolved without computational deconvolution.',
+    action:'Use software tools like TIDE, ICE, or DECODR to computationally deconvolve the two overlapping sequences. Compare forward and reverse reads — the phase shift will appear in opposite directions relative to the indel site. Clone individual alleles if needed.',
+    keyFeature:'Clean → abrupt mess that never recovers. The transition point marks the indel site.',
+    build:function(){
+      const seq='ATGCACGTAG';
+      const pos=basePos(seq.length);
+      const cleanChs=seqPeaks(seq);
+      // Keep clean peaks for first 4 positions, make mess after
+      const transitionIdx=4;
+      // Add phase-shifted secondary peaks after position 4
+      const shifted='NNNNCGATCAGTCG';
+      for(let i=transitionIdx;i<seq.length;i++){
+        // Add secondary peaks in 2-3 other channels
+        const others=[0,1,2,3].filter(c=>c!==BMAP[seq[i]]);
+        for(let j=0;j<2;j++){
+          const ch=others[j];
+          chs=cleanChs;
+          chs[ch].push({x:pos[i]+(j===0?-8:8),h:0.35+0.1*Math.sin(i*2),s:18});
+        }
+      }
+      // Annotation for transition point
+      const tx=pos[transitionIdx];
+      const anno=`<line x1="${tx-15}" y1="20" x2="${tx-15}" y2="${BL}" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="${tx-15}" y="${BL+14}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#dc2626">INDEL SITE</text>`;
+      return{seq,svg:fullSVG(seq,cleanChs,{noise:0.008,annotations:anno})};
+    }
+  },
+
+  low:{
+    title:'Low Signal / Noise',
+    icon:'📉',
+    note:'Very weak peaks barely above a noisy baseline — base calls are unreliable.',
+    howItLooks:'All peaks are much shorter than normal (often less than 20% of expected height). The baseline is elevated and jagged with random noise. It becomes difficult to distinguish true peaks from noise artifacts. The base-calling software may assign many "N" calls.',
+    cause:'Insufficient template DNA, degraded template, primer failure (wrong concentration or low binding efficiency), inhibited reaction due to contaminants (salts, ethanol, EDTA, detergents), or expired reagents.',
+    action:'Re-quantify the template using a fluorometric method (Qubit). Check DNA integrity on an agarose gel. Increase template concentration. Verify primer quality and concentration. Check the A260/A280 ratio (should be 1.8–2.0) and A260/A230 ratio (≥ 2.0) to rule out contaminants.',
+    keyFeature:'Tiny peaks drowned in noise — nothing stands out clearly.',
+    build:function(){
+      const seq=CLEAN_SEQ;
+      const heights=seq.split('').map((_,i)=>0.12+0.06*Math.sin(i*1.5));
+      const chs=seqPeaks(seq,{heights});
+      return{seq,svg:fullSVG(seq,chs,{noise:0.04})};
+    }
+  },
+
+  end:{
+    title:'End-of-Read Drop-off',
+    icon:'📉',
+    note:'Peaks start strong and progressively fade toward the end of the read.',
+    howItLooks:'The first half of the trace shows clean, well-defined peaks. As you move toward the right (later bases), peak heights gradually decrease, the baseline becomes noisier, and peaks may broaden or overlap. This is a natural consequence of reagent depletion and is expected in every Sanger read.',
+    cause:'Normal behavior. As the sequencing reaction progresses, dNTPs and dye terminators are consumed. The polymerase eventually runs out of reagents, and the signal-to-noise ratio drops. Typical useful read lengths are 500–900 bases depending on template quality.',
+    action:'Trim the low-quality tail before interpreting the data. Most software can trim automatically based on a quality threshold (e.g., Q ≥ 20). Do not make variant calls from the faded region — if the region of interest falls in the tail, re-design the primer to bring it into the high-quality zone.',
+    keyFeature:'Gradual fade-out — normal and expected. Just trim.',
+    build:function(){
+      const seq=CLEAN_SEQ;
+      const chs=seqPeaks(seq);
+      return{seq,svg:fullSVG(seq,chs,{fade:{s:350,e:750,amt:0.92},noise:0.012})};
+    }
+  },
+
+  broad:{
+    title:'Broad Peaks',
+    icon:'〰️',
+    note:'Wide, poorly resolved peaks that merge into each other — reducing base-call accuracy.',
+    howItLooks:'Instead of sharp gaussian peaks, each peak is wide and spread out. Adjacent peaks overlap significantly, making it hard to tell where one ends and the next begins. Peak heights may also be reduced. The overall trace looks "mushy" and blurred.',
+    cause:'Contaminants in the template (salts, EDTA, residual ethanol, proteins, or detergents). Excess template DNA can also cause broad peaks. Less commonly, capillary or electrophoresis problems (blockage, buffer issues, temperature fluctuations).',
+    action:'Re-purify the template DNA. Elute in nuclease-free water or 10 mM Tris (avoid TE buffer). Re-quantify with a fluorometric method. Ensure all residual ethanol is removed after column purification. If using PCR products, verify that primers and dNTPs have been completely cleaned up.',
+    keyFeature:'Peaks are wide and mushy — they bleed into each other.',
+    build:function(){
+      const seq=CLEAN_SEQ;
+      const chs=seqPeaks(seq,{sigma:42});
+      return{seq,svg:fullSVG(seq,chs)};
+    }
+  },
+
+  sat:{
+    title:'Signal Saturation',
+    icon:'⚡',
+    note:'Flat-topped peaks that hit the detector ceiling, with pull-up ghost peaks in other channels.',
+    howItLooks:'The tops of the tallest peaks are clipped flat (squared off) instead of having a smooth gaussian shape. Below these saturated peaks, you often see smaller "ghost" peaks in other color channels — this is called spectral pull-up or cross-talk. These pull-up artifacts can mimic heterozygous variants.',
+    cause:'Too much template DNA in the reaction, overwhelming the instrument\'s CCD camera or photodetector. The signal exceeds the dynamic range of the detector, causing clipping. The excess signal also bleeds into other fluorescence channels, creating pull-up artifacts.',
+    action:'Reduce the amount of template DNA (dilute 2–5 fold and re-run). If using a core facility, request a lower injection voltage or shorter injection time. Do not interpret pull-up peaks as real variants. After dilution, the trace should show normal rounded peaks without pull-up.',
+    keyFeature:'Flat-topped peaks + ghost peaks in other channels below them.',
+    build:function(){
+      const seq=CLEAN_SEQ;
+      const chs=seqPeaks(seq,{heights:seq.split('').map(()=>1.1)});
+      // Add pull-up peaks: small ghost peaks in non-dominant channels at each position
+      const pos=basePos(seq.length);
+      for(let i=0;i<seq.length;i++){
+        const primary=BMAP[seq[i]];
+        const others=[0,1,2,3].filter(c=>c!==primary);
+        for(const ch of others){
+          chs[ch].push({x:pos[i],h:0.18,s:20});
+        }
+      }
+      return{seq,svg:fullSVG(seq,chs,{clip:0.85})};
+    }
+  },
+
+  stutter:{
+    title:'Stutter Peaks',
+    icon:'🔁',
+    note:'Small echo peaks around homopolymeric runs — from polymerase slippage on repeat sequences.',
+    howItLooks:'In a region with repeated bases (e.g., AAAA or TTTT), you see the main peaks plus smaller "stutter" peaks shifted slightly before or after each main peak. The stutter peaks are in the same color as the main peaks but at reduced height (typically 10–30%). After the repeat region, the trace may return to normal or show a slight phase shift.',
+    cause:'DNA polymerase slippage during the sequencing reaction. When the polymerase encounters a long homopolymeric run or simple repeat (like microsatellites), it can slip and re-anneal at a slightly different position, producing truncated or extended products. This creates the characteristic stutter pattern.',
+    action:'If the homopolymer is in your region of interest, consider cloning the alleles into separate vectors and sequencing individually. Specialized high-fidelity polymerases may reduce stutter. For microsatellite analysis, use fragment analysis instead of Sanger sequencing.',
+    keyFeature:'Echo peaks (same color, reduced height) flanking a homopolymer run.',
+    build:function(){
+      const seq='AAAAGCTAGC'; // 4x A then normal
+      const chs=seqPeaks(seq);
+      const pos=basePos(seq.length);
+      // Add stutter peaks for the A homopolymer (positions 0-3)
+      for(let i=0;i<4;i++){
+        // Small echo peak shifted by ±25px
+        chs[0].push({x:pos[i]-25,h:0.15,s:16});
+        chs[0].push({x:pos[i]+25,h:0.12,s:16});
+      }
+      const anno=`<rect x="${pos[0]-35}" y="16" width="${pos[3]-pos[0]+70}" height="${BL-20}" rx="6" fill="#fef3c7" opacity=".18" stroke="#f59e0b" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="${(pos[0]+pos[3])/2}" y="${BL+14}" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#d97706">HOMOPOLYMER RUN</text>`;
+      return{seq,svg:fullSVG(seq,chs,{noise:0.008,annotations:anno})};
+    }
+  },
+
+  structure:{
+    title:'Secondary Structure',
+    icon:'🔒',
+    note:'Clean trace that abruptly stops mid-read — the polymerase hit a hairpin or stem-loop.',
+    howItLooks:'The trace begins normally with clean, well-resolved peaks. At a specific position, the signal abruptly drops to near zero or becomes extremely noisy. Unlike end-of-read drop-off (which is gradual), this is sudden and unexpected. The position of the signal loss corresponds to a secondary structure in the DNA template.',
+    cause:'The DNA template forms a stable secondary structure (hairpin, stem-loop, G-quadruplex) that the sequencing polymerase cannot read through. The polymerase stalls or falls off the template at the structure site, terminating the reaction. GC-rich regions and palindromic sequences are common culprits.',
+    action:'Add DMSO (5–10%) or betaine to the sequencing reaction to destabilize secondary structures. Try sequencing from the opposite direction (the structure may be less stable on the complementary strand). Use a different primer to approach the region from a different angle. Consider using specialized sequencing chemistry designed for difficult templates.',
+    keyFeature:'Abrupt signal loss — not gradual like normal end-of-read decline.',
+    build:function(){
+      const seq=CLEAN_SEQ;
+      const chs=seqPeaks(seq);
+      // Abrupt fade starting at position 5
+      const pos=basePos(seq.length);
+      const cutX=pos[5]-20;
+      // Mark the arrest point
+      const anno=`<line x1="${cutX}" y1="16" x2="${cutX}" y2="${BL}" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="${cutX+4}" y="28" text-anchor="start" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#dc2626">ARREST</text>`;
+      return{seq,svg:fullSVG(seq,chs,{fade:{s:cutX-20,e:cutX+60,amt:0.97},noise:0.015,annotations:anno})};
+    }
+  }
+};
+
+/* ================================================================
+   TAB ORDER & RENDERING
+   ================================================================ */
+const ORDER=[
+  ['hetero','Heterozygous SNP'],
+  ['homo','Homozygous Variant'],
+  ['dye','Dye Blob'],
+  ['mixed','Mixed Template'],
+  ['indel','Indel (Het)'],
+  ['low','Low Signal'],
+  ['end','End Drop-off'],
+  ['broad','Broad Peaks'],
+  ['sat','Signal Saturation'],
+  ['stutter','Stutter Peaks'],
+  ['structure','Secondary Structure']
+];
+
+function render(key){
+  const pat=PATTERNS[key];
+  const built=pat.build();
+  const viewer=document.getElementById('viewer');
+  viewer.innerHTML=`
+    <div class="grid2" style="margin-top:14px">
+      <div class="tracebox">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:1.3rem">${pat.icon}</span>
+          <div class="sect-title" style="margin:0">${pat.title}</div>
+        </div>
+        <div class="sect-head" style="font-size:1.2rem;margin-top:6px">${pat.note}</div>
+        <div class="legend" style="margin-top:8px">
+          <span><i class="dot" style="background:var(--col-a)"></i>A</span>
+          <span><i class="dot" style="background:var(--col-c)"></i>C</span>
+          <span><i class="dot" style="background:var(--col-g)"></i>G</span>
+          <span><i class="dot" style="background:var(--col-t)"></i>T</span>
+        </div>
+        <div class="tracewrap" style="margin-top:8px">
+          <svg viewBox="0 0 ${W} ${BL+20}">${built.svg}</svg>
+        </div>
+        <div class="anno-tag" style="margin-top:8px">🔑 Key Feature: ${pat.keyFeature}</div>
+      </div>
+      <div style="display:grid;gap:12px;align-content:start">
+        <div class="info em">
+          <h3>🔍 How It Looks</h3>
+          <p>${pat.howItLooks}</p>
+        </div>
+        <div class="info warn">
+          <h3>⚠️ Likely Cause</h3>
+          <p>${pat.cause}</p>
+        </div>
+        <div class="info good">
+          <h3>✅ What To Do</h3>
+          <p>${pat.action}</p>
+        </div>
+      </div>
+    </div>`;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.key===key));
+}
+
+/* ================================================================
+   INITIALIZE
+   ================================================================ */
+// Build tabs
+const tabsEl=document.getElementById('tabs');
+ORDER.forEach(([key,label])=>{
+  const btn=document.createElement('button');
+  btn.className='tab';
+  btn.textContent=label;
+  btn.dataset.key=key;
+  btn.onclick=()=>render(key);
+  tabsEl.appendChild(btn);
+});
+
+// Render clean read in hero section
+(function(){
+  const clean=PATTERNS.clean.build();
+  document.getElementById('cleanSvg').innerHTML=clean.svg;
+  document.getElementById('cleanSvg').setAttribute('viewBox',`0 0 ${W} ${BL+20}`);
+})();
+
+// Render first tab
+render('hetero');
+</script>
+</body>
+</html>
